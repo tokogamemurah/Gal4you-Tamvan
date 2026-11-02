@@ -1,0 +1,341 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GAL4YOU TAMVAN</title>
+
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+
+body {
+  font-family:Arial,sans-serif;
+  background:#101522;
+  color:white;
+}
+
+header {
+  background:#1b2540;
+  padding:25px 15px;
+  text-align:center;
+}
+
+header h1 { color:#8da0ff; }
+header p { color:#ccc; margin-top:8px; }
+
+.container {
+  max-width:1100px;
+  margin:auto;
+  padding:20px;
+}
+
+.search {
+  width:100%;
+  padding:13px;
+  border-radius:8px;
+  border:0;
+  margin:15px 0;
+}
+
+.products {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:17px;
+}
+
+.card {
+  background:#202b45;
+  padding:13px;
+  border-radius:12px;
+}
+
+.card img {
+  width:100%;
+  height:170px;
+  object-fit:cover;
+  border-radius:8px;
+}
+
+.card h3 { margin:12px 0 7px; }
+
+.spek {
+  color:#c6ccda;
+  font-size:14px;
+  line-height:1.6;
+}
+
+.price {
+  color:#9eafff;
+  font-size:19px;
+  font-weight:bold;
+  margin:12px 0;
+}
+
+.status { color:#65e6a0; font-size:13px; }
+.sold { color:#ff8585; }
+
+button {
+  padding:11px;
+  border:0;
+  border-radius:7px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.detail {
+  width:100%;
+  background:#465a9b;
+  color:white;
+}
+
+.add {
+  width:100%;
+  background:#788cff;
+  color:white;
+  margin-top:7px;
+}
+
+button:disabled {
+  background:#555;
+  cursor:not-allowed;
+}
+
+.cart {
+  background:#202b45;
+  padding:18px;
+  border-radius:12px;
+  margin-top:30px;
+}
+
+.cart-item {
+  border-bottom:1px solid #526078;
+  padding:12px 0;
+}
+
+.remove {
+  background:#a33f4a;
+  color:white;
+  margin-top:6px;
+}
+
+.checkout {
+  width:100%;
+  background:#1eaa68;
+  color:white;
+  margin-top:15px;
+}
+
+footer {
+  text-align:center;
+  color:#aaa;
+  padding:25px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>GAL4YOU TAMVAN</h1>
+  <p>Tempat Pilihan Akun Game</p>
+</header>
+
+<main class="container">
+
+  <h2>Katalog Akun Game</h2>
+
+  <input
+    class="search"
+    id="cari"
+    placeholder="Cari akun atau game..."
+    oninput="tampilProduk()"
+  >
+
+  <div class="products" id="list"></div>
+
+  <section class="cart">
+    <h2>Keranjang Pesanan</h2>
+    <div id="keranjang">Belum ada pesanan.</div>
+    <h3 id="total" style="margin-top:15px">Total: Rp0</h3>
+
+    <button class="checkout" onclick="checkout()">
+      Pesan melalui WhatsApp
+    </button>
+  </section>
+
+</main>
+
+<footer>
+  © 2026 GAL4YOU TAMVAN
+</footer>
+
+<script>
+
+// GANTI DENGAN NOMOR WHATSAPP ADMIN
+const nomorWA = "6281234567890";
+
+// SETIAP AKUN ADALAH PRODUK TERSENDIRI
+const produk = [
+  {
+    id:1,
+    nama:"Akun ML #001",
+    game:"Mobile Legends",
+    harga:150000,
+    spek:"Rank Mythic, 50 Skin, 80 Hero",
+    foto:["images/ml1.jpg","images/ml1-2.jpg"],
+    status:"tersedia"
+  },
+  {
+    id:2,
+    nama:"Akun ML #002",
+    game:"Mobile Legends",
+    harga:100000,
+    spek:"Rank Legend, 30 Skin, 65 Hero",
+    foto:["images/ml2.jpg"],
+    status:"tersedia"
+  },
+  {
+    id:3,
+    nama:"Akun FF #001",
+    game:"Free Fire",
+    harga:120000,
+    spek:"Level 65, 30 Bundle, Banyak Skin",
+    foto:["images/ff1.jpg"],
+    status:"tersedia"
+  }
+];
+
+let keranjang = [];
+
+function rupiah(n) {
+  return "Rp" + n.toLocaleString("id-ID");
+}
+
+function tampilProduk() {
+  let kata = document.getElementById("cari").value.toLowerCase();
+
+  let hasil = produk.filter(p =>
+    (p.nama + p.game + p.spek).toLowerCase().includes(kata)
+  );
+
+  document.getElementById("list").innerHTML = hasil.map(p => `
+    <div class="card">
+      <img src="${p.foto[0]}" alt="${p.nama}"
+      onerror="this.src='https://placehold.co/400x250?text=Foto+Akun'">
+
+      <h3>${p.nama}</h3>
+      <p class="spek">${p.game}</p>
+      <p class="spek">${p.spek}</p>
+      <p class="price">${rupiah(p.harga)}</p>
+
+      <p class="${p.status === 'tersedia' ? 'status' : 'sold'}">
+        ${p.status === 'tersedia' ? '● Tersedia' : '● Terjual'}
+      </p>
+
+      <button class="detail" onclick="detail(${p.id})">
+        Lihat Detail
+      </button>
+
+      <button class="add"
+      onclick="tambah(${p.id})"
+      ${p.status !== 'tersedia' ? 'disabled' : ''}>
+        Tambah Pesanan
+      </button>
+    </div>
+  `).join("");
+}
+
+function detail(id) {
+  let p = produk.find(x => x.id === id);
+
+  alert(
+    "DETAIL AKUN\n\n" +
+    p.nama + "\n" +
+    p.game + "\n" +
+    p.spek + "\n" +
+    "Harga: " + rupiah(p.harga) + "\n" +
+    "Foto tersedia: " + p.foto.length
+  );
+}
+
+function tambah(id) {
+  let p = produk.find(x => x.id === id);
+
+  if (p.status !== "tersedia") {
+    alert("Akun sudah terjual!");
+    return;
+  }
+
+  if (keranjang.some(x => x.id === id)) {
+    alert("Akun sudah ada di keranjang!");
+    return;
+  }
+
+  keranjang.push(p);
+  tampilKeranjang();
+}
+
+function hapus(i) {
+  keranjang.splice(i,1);
+  tampilKeranjang();
+}
+
+function tampilKeranjang() {
+  let area = document.getElementById("keranjang");
+
+  if (!keranjang.length) {
+    area.innerHTML = "Belum ada pesanan.";
+  } else {
+    area.innerHTML = keranjang.map((p,i) => `
+      <div class="cart-item">
+        <b>${p.nama}</b>
+        <p>${p.spek}</p>
+        <p>${rupiah(p.harga)}</p>
+        <button class="remove" onclick="hapus(${i})">
+          Hapus
+        </button>
+      </div>
+    `).join("");
+  }
+
+  let total = keranjang.reduce((a,p) => a+p.harga,0);
+
+  document.getElementById("total").innerText =
+    "Total: " + rupiah(total);
+}
+
+function checkout() {
+  if (!keranjang.length) {
+    alert("Keranjang masih kosong!");
+    return;
+  }
+
+  let pesan = "Halo admin GAL4YOU TAMVAN, saya ingin memesan:\n\n";
+
+  keranjang.forEach((p,i) => {
+    pesan +=
+      (i+1) + ". " + p.nama + "\n" +
+      "Game: " + p.game + "\n" +
+      "Spek: " + p.spek + "\n" +
+      "Harga: " + rupiah(p.harga) + "\n\n";
+  });
+
+  let total = keranjang.reduce((a,p) => a+p.harga,0);
+
+  pesan += "Total: " + rupiah(total);
+
+  window.open(
+    "https://wa.me/" + nomorWA +
+    "?text=" + encodeURIComponent(pesan),
+    "_blank"
+  );
+}
+
+tampilProduk();
+tampilKeranjang();
+
+</script>
+</body>
+  </html>
+  
