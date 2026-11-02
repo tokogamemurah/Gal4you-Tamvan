@@ -1,0 +1,543 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GAL4YOU TAMVAN - Store Akun Game</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #081225;
+  color: white;
+}
+
+header {
+  background: #142747;
+  padding: 25px 15px;
+  text-align: center;
+}
+
+.logo {
+  width: 75px;
+  height: 75px;
+  border-radius: 15px;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+header h1 {
+  color: #38bdf8;
+  margin: 5px;
+}
+
+header p {
+  color: #cbd5e1;
+}
+
+main {
+  max-width: 1100px;
+  margin: auto;
+  padding: 20px;
+}
+
+input, select {
+  width: 100%;
+  padding: 13px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 8px;
+  background: #e5e7eb;
+}
+
+button {
+  padding: 11px 15px;
+  border: none;
+  border-radius: 8px;
+  background: #0284c7;
+  color: white;
+  cursor: pointer;
+  margin: 4px;
+}
+
+button:hover {
+  background: #0369a1;
+}
+
+.products {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.card {
+  background: #142747;
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.card img {
+  width: 100%;
+  height: 170px;
+  object-fit: cover;
+  border-radius: 9px;
+}
+
+.card h3 {
+  color: #38bdf8;
+}
+
+.price {
+  color: #38bdf8;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.stock {
+  color: #86efac;
+}
+
+.cart {
+  background: #142747;
+  padding: 18px;
+  border-radius: 12px;
+  margin-top: 30px;
+}
+
+.cart-item {
+  border-bottom: 1px solid #365071;
+  padding: 10px 0;
+}
+
+.whatsapp {
+  background: #16a34a;
+  width: 100%;
+  margin-top: 15px;
+  font-size: 16px;
+}
+
+.whatsapp:hover {
+  background: #15803d;
+}
+
+.empty {
+  color: #cbd5e1;
+}
+
+footer {
+  text-align: center;
+  color: #94a3b8;
+  padding: 25px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <img class="logo"
+  src="https://i.ibb.co.com/C3cjNcgt/Gemini-Generated-Image-m1hx9fm1hx9fm1hx.png"
+  alt="Logo GAL4YOU TAMVAN"
+  onerror="this.style.display='none'">
+
+  <h1>GAL4YOU TAMVAN</h1>
+  <p>STORE AKUN GAME</p>
+  <p>Free Fire | Mobile Legends | Roblox | Game Lainnya</p>
+</header>
+
+<main>
+
+<h2>Katalog Akun Game</h2>
+
+<input
+  id="search"
+  placeholder="Cari nama akun..."
+  oninput="render()">
+
+<select id="category" onchange="render()">
+  <option value="Semua">Semua Game</option>
+  <option value="Free Fire">Free Fire</option>
+  <option value="Mobile Legends">Mobile Legends</option>
+  <option value="Clash of Clans">Clash of Clans</option>
+  <option value="Roblox">Roblox</option>
+  <option value="Lainnya">Game Lainnya</option>
+</select>
+
+<div class="products" id="products"></div>
+
+<div class="cart">
+  <h2>Keranjang Pesanan</h2>
+
+  <div id="cart">
+    <p class="empty">Keranjang masih kosong.</p>
+  </div>
+
+  <h3 id="total">Total: Rp0</h3>
+
+  <button class="whatsapp" onclick="checkout()">
+    Pesan melalui WhatsApp
+  </button>
+</div>
+
+</main>
+
+<footer>
+  <p>© 2026 GAL4YOU TAMVAN</p>
+  <p>Terima kasih sudah berkunjung!</p>
+</footer>
+
+<script>
+
+// ==================================
+// DATA PRODUK
+// GANTI DATA CONTOH DENGAN AKUN ASLI
+// ==================================
+
+let products = [
+  {
+    id: 1,
+    game: "Free Fire",
+    name: "Akun FF #001",
+    spek: "100 Skin, 50 Bundle",
+    price: 250000,
+    stock: 1,
+    photo: "https://i.ibb.co.com/N6P57744/Screenshot-20261024-010538.png"
+  },
+  {
+    id: 2,
+    game: "Mobile Legends",
+    name: "Akun ML #001",
+    spek: "50 Skin, 80 Hero",
+    price: 350000,
+    stock: 2,
+    photo: ""
+  },
+  {
+    id: 3,
+    game: "Clash of Clans",
+    name: "Akun COC #001",
+    spek: "Town Hall 13",
+    price: 200000,
+    stock: 1,
+    photo: ""
+  },
+  {
+    id: 4,
+    game: "Roblox",
+    name: "Akun Roblox #001",
+    spek: "Banyak Item dan Gamepass",
+    price: 150000,
+    stock: 1,
+    photo: ""
+  }
+];
+
+// ==================================
+// KERANJANG
+// ==================================
+
+let cart = [];
+
+// ==================================
+// FORMAT HARGA
+// ==================================
+
+function formatRupiah(number) {
+  return "Rp" + number.toLocaleString("id-ID");
+}
+
+// ==================================
+// TAMPILKAN PRODUK
+// ==================================
+
+function render() {
+
+  let search = document
+    .getElementById("search")
+    .value.toLowerCase();
+
+  let category = document
+    .getElementById("category")
+    .value;
+
+  let area = document.getElementById("products");
+
+  area.innerHTML = "";
+
+  let found = 0;
+
+  products.forEach((p) => {
+
+    if (
+      !p.name.toLowerCase().includes(search) &&
+      !p.game.toLowerCase().includes(search)
+    ) {
+      return;
+    }
+
+    if (category !== "Semua" && p.game !== category) {
+      return;
+    }
+
+    found++;
+
+    let image = p.photo
+      ? `<img src="${p.photo}" alt="Foto ${p.name}"
+           onerror="this.outerHTML='<p class=empty>Foto tidak dapat ditampilkan</p>'">`
+      : `<p class="empty">Foto akun belum tersedia</p>`;
+
+    area.innerHTML += `
+      <div class="card">
+
+        ${image}
+
+        <h3>${p.name}</h3>
+
+        <p>Game: ${p.game}</p>
+
+        <p>Spek: ${p.spek}</p>
+
+        <p class="stock">Stok: ${p.stock}</p>
+
+        <p class="price">${formatRupiah(p.price)}</p>
+
+        <button onclick="detail(${p.id})">
+          Lihat Detail
+        </button>
+
+        <button onclick="addCart(${p.id})">
+          Tambah Pesanan
+        </button>
+
+      </div>
+    `;
+  });
+
+  if (found === 0) {
+    area.innerHTML = "<p>Akun tidak ditemukan.</p>";
+  }
+}
+
+// ==================================
+// DETAIL PRODUK
+// ==================================
+
+function detail(id) {
+
+  let p = products.find(item => item.id === id);
+
+  if (!p) return;
+
+  alert(
+    "Nama: " + p.name +
+    "\nGame: " + p.game +
+    "\nSpek: " + p.spek +
+    "\nHarga: " + formatRupiah(p.price) +
+    "\nStok: " + p.stock
+  );
+}
+
+// ==================================
+// TAMBAH KE KERANJANG
+// ==================================
+
+function addCart(id) {
+
+  let p = products.find(item => item.id === id);
+
+  if (!p || p.stock <= 0) {
+    alert("Stok akun habis!");
+    return;
+  }
+
+  let item = cart.find(item => item.id === id);
+
+  let jumlah = item ? item.qty : 0;
+
+  if (jumlah >= p.stock) {
+    alert("Jumlah pesanan melebihi stok!");
+    return;
+  }
+
+  if (item) {
+    item.qty++;
+  } else {
+    cart.push({
+      id: id,
+      qty: 1
+    });
+  }
+
+  showCart();
+
+  alert("Akun berhasil dimasukkan ke keranjang!");
+}
+
+// ==================================
+// TAMPILKAN KERANJANG
+// ==================================
+
+function showCart() {
+
+  let area = document.getElementById("cart");
+
+  let total = 0;
+
+  if (cart.length === 0) {
+
+    area.innerHTML =
+      '<p class="empty">Keranjang masih kosong.</p>';
+
+    document.getElementById("total").innerText =
+      "Total: Rp0";
+
+    return;
+  }
+
+  area.innerHTML = "";
+
+  cart.forEach(item => {
+
+    let p = products.find(x => x.id === item.id);
+
+    if (!p) return;
+
+    let subtotal = p.price * item.qty;
+
+    total += subtotal;
+
+    area.innerHTML += `
+      <div class="cart-item">
+
+        <b>${p.name}</b>
+
+        <p>Jumlah: ${item.qty}</p>
+
+        <p>${formatRupiah(subtotal)}</p>
+
+        <button onclick="changeQty(${p.id},-1)">-</button>
+
+        <button onclick="changeQty(${p.id},1)">+</button>
+
+        <button onclick="removeCart(${p.id})">
+          Hapus dari Keranjang
+        </button>
+
+      </div>
+    `;
+  });
+
+  document.getElementById("total").innerText =
+    "Total: " + formatRupiah(total);
+}
+
+// ==================================
+// UBAH JUMLAH PESANAN
+// ==================================
+
+function changeQty(id, amount) {
+
+  let item = cart.find(x => x.id === id);
+
+  let p = products.find(x => x.id === id);
+
+  if (!item || !p) return;
+
+  let next = item.qty + amount;
+
+  if (next <= 0) {
+    removeCart(id);
+    return;
+  }
+
+  if (next > p.stock) {
+    alert("Jumlah melebihi stok!");
+    return;
+  }
+
+  item.qty = next;
+
+  showCart();
+}
+
+// ==================================
+// HAPUS DARI KERANJANG
+// ==================================
+
+function removeCart(id) {
+
+  cart = cart.filter(item => item.id !== id);
+
+  showCart();
+}
+
+// ==================================
+// CHECKOUT WHATSAPP TOKO
+// ==================================
+
+function checkout() {
+
+  if (cart.length === 0) {
+    alert("Keranjang masih kosong!");
+    return;
+  }
+
+  let message =
+    "Halo GAL4YOU TAMVAN, saya ingin memesan:\n\n";
+
+  let total = 0;
+
+  cart.forEach(item => {
+
+    let p = products.find(x => x.id === item.id);
+
+    if (!p) return;
+
+    let subtotal = p.price * item.qty;
+
+    total += subtotal;
+
+    message +=
+      p.name +
+      "\nGame: " + p.game +
+      "\nSpek: " + p.spek +
+      "\nJumlah: " + item.qty +
+      "\nHarga: " + formatRupiah(subtotal) +
+      "\n\n";
+  });
+
+  message += "Total: " + formatRupiah(total);
+
+  message +=
+    "\n\nMohon konfirmasi ketersediaan akun. Terima kasih.";
+
+  // NOMOR WHATSAPP TOKO
+  let nomor = "62881026604014";
+
+  let url =
+    "https://wa.me/" +
+    nomor +
+    "?text=" +
+    encodeURIComponent(message);
+
+  window.open(url, "_blank");
+}
+
+// ==================================
+// MULAI WEBSITE
+// ==================================
+
+render();
+showCart();
+
+</script>
+
+</body>
+</html>
