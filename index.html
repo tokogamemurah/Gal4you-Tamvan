@@ -136,6 +136,48 @@ footer {
   color: #94a3b8;
   padding: 25px;
 }
+
+/* ==================================
+   TESTIMONI DAN ULASAN
+================================== */
+
+.reviews {
+  background: #142747;
+  padding: 18px;
+  border-radius: 12px;
+  margin-top: 30px;
+}
+
+.reviews h2 {
+  color: #38bdf8;
+}
+
+.review-form {
+  margin-top: 15px;
+}
+
+.review-item {
+  background: #081225;
+  border-radius: 9px;
+  padding: 13px;
+  margin-top: 12px;
+  overflow-wrap: anywhere;
+}
+
+.review-stars {
+  color: #facc15;
+  font-size: 20px;
+}
+
+.review-name {
+  color: #38bdf8;
+  font-weight: bold;
+}
+
+.review-date {
+  color: #94a3b8;
+  font-size: 12px;
+}
 </style>
 </head>
 
@@ -186,6 +228,52 @@ footer {
   </button>
 </div>
 
+<!-- ==================================
+     TESTIMONI DAN ULASAN
+================================== -->
+
+<div class="reviews">
+
+  <h2>Testimoni dan Ulasan Pelanggan</h2>
+
+  <p class="empty">
+    Bagikan pengalaman kamu berbelanja di GAL4YOU TAMVAN.
+  </p>
+
+  <div class="review-form">
+
+    <input
+      type="text"
+      id="reviewName"
+      placeholder="Masukkan nama kamu">
+
+    <select id="reviewRating">
+      <option value="5">★★★★★ - Sangat Puas</option>
+      <option value="4">★★★★ - Puas</option>
+      <option value="3">★★★ - Cukup</option>
+      <option value="2">★★ - Kurang Puas</option>
+      <option value="1">★ - Tidak Puas</option>
+    </select>
+
+    <input
+      type="text"
+      id="reviewComment"
+      placeholder="Tulis pengalaman kamu">
+
+    <button onclick="addReview()">
+      Kirim Ulasan
+    </button>
+
+  </div>
+
+  <h3>Ulasan Pelanggan</h3>
+
+  <div id="reviewList">
+    <p class="empty">Belum ada ulasan.</p>
+  </div>
+
+</div>
+
 </main>
 
 <footer>
@@ -215,7 +303,7 @@ let products = [
     name: "Akun FF #002",
     spek: "PRIME 5, SG MAMBA, V220+, BAJU GOIB, SENJATA ALROFF, NICKNAME KUNING, ANIMASI 2 SKYWING GERAK ONN ",
     price: 100000,
-    photo: "https://i.ibb.co.com/C3cjNcgt/Gemini-Generated-Image-m1hx9fm1hx9fm1hx.png⁠"
+    photo: "https://i.ibb.co.com/6JppwPzq/Screenshot-20261016-224915.png⁠⁠"
   },
   {
     id: 3,
@@ -227,8 +315,8 @@ let products = [
   },
   {
     id: 4,
-    game: "Roblox",
-    name: "Akun Roblox #001",
+    game: "FREE FIRE",
+    name: "Akun FF #004",
     spek: "Banyak Item dan Gamepass",
     price: 15000,
     stock: 1,
@@ -528,13 +616,128 @@ function checkout() {
 }
 
 // ==================================
+// TESTIMONI DAN ULASAN
+// ==================================
+
+let reviews = [];
+
+try {
+  reviews = JSON.parse(
+    localStorage.getItem("gal4you_reviews") || "[]"
+  );
+
+  if (!Array.isArray(reviews)) {
+    reviews = [];
+  }
+} catch (error) {
+  reviews = [];
+}
+
+function escapeReviewText(value) {
+  return String(value).replace(/[&<>"']/g, function(char) {
+    return {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    }[char];
+  });
+}
+
+function renderReviews() {
+
+  let area = document.getElementById("reviewList");
+
+  area.innerHTML = "";
+
+  if (reviews.length === 0) {
+    area.innerHTML =
+      '<p class="empty">Belum ada ulasan.</p>';
+    return;
+  }
+
+  reviews.forEach(review => {
+
+    let name = escapeReviewText(review.name);
+    let comment = escapeReviewText(review.comment);
+    let date = escapeReviewText(review.date);
+    let rating = Math.min(5, Math.max(1, Number(review.rating) || 5));
+
+    area.innerHTML += `
+      <div class="review-item">
+
+        <p class="review-name">${name}</p>
+
+        <p class="review-stars">
+          ${"★".repeat(rating)}
+          ${"☆".repeat(5 - rating)}
+        </p>
+
+        <p>${comment}</p>
+
+        <p class="review-date">${date}</p>
+
+      </div>
+    `;
+  });
+}
+
+function addReview() {
+
+  let name = document
+    .getElementById("reviewName")
+    .value.trim();
+
+  let rating = Number(
+    document.getElementById("reviewRating").value
+  );
+
+  let comment = document
+    .getElementById("reviewComment")
+    .value.trim();
+
+  if (!name || !comment) {
+    alert("Nama dan ulasan harus diisi!");
+    return;
+  }
+
+  reviews.unshift({
+    name: name,
+    rating: rating,
+    comment: comment,
+    date: new Date().toLocaleDateString("id-ID")
+  });
+
+  try {
+    localStorage.setItem(
+      "gal4you_reviews",
+      JSON.stringify(reviews)
+    );
+  } catch (error) {
+    reviews.shift();
+    alert("Ulasan tidak dapat disimpan di browser ini.");
+    return;
+  }
+
+  document.getElementById("reviewName").value = "";
+  document.getElementById("reviewComment").value = "";
+
+  renderReviews();
+
+  alert("Terima kasih sudah memberikan ulasan!");
+}
+
+// ==================================
 // MULAI WEBSITE
 // ==================================
 
 render();
 showCart();
+renderReviews();
 
 </script>
 
 </body>
-</html>
+  </html>
+  
